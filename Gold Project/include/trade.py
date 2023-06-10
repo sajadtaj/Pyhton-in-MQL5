@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 import MetaTrader5 as Mt5
+import sys
 
 
 class Trade:
@@ -164,7 +165,18 @@ class Trade:
         # Check the execution result
         print(f'Order sent: {self.symbol}, {self.lot} lot(s), at {price}.')
         if result.retcode != Mt5.TRADE_RETCODE_DONE:
+            print('--'*25)
             print(f'Something went wrong while retrieving ret_code, error: {result.retcode}')
+            print('--'*25)
+            print('Error Discription :')
+            ReturnErorrDisc(result.retcode)
+            print('--'*25)
+            print('Statistics :')
+            self.statistics()
+            print('--'*25)
+            TerminatedMT()
+            
+            
 
         # Print the result
         if result.retcode == Mt5.TRADE_RETCODE_DONE:
@@ -264,3 +276,24 @@ class Trade:
             if datetime.now().minute < int(self.finishing_time_minutes):
                 return True
         return False
+
+
+
+def ReturnErorrDisc(retcode):
+    if retcode== 10018: 
+        print('Market is closed')
+    elif retcode== 10026: 
+        print('Autotrading disabled by server')
+        
+    elif retcode== 10027: 
+        print('Autotrading disabled by client terminal')
+        
+    elif retcode== 10014: 
+        print('Invalid volume in the request')
+        
+    elif retcode== 10017: 
+        print('Trade is disabled')
+        
+def TerminatedMT():
+    sys.exit("Exiting the code with sys.exit()!")
+    
