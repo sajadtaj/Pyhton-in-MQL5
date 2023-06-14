@@ -143,19 +143,19 @@ class Trade:
         self.ticket = (Mt5.positions_get()[0].ticket if len(Mt5.positions_get()) == 1 else 0)
 
         request = {
-            "action": Mt5.TRADE_ACTION_DEAL,
-            "symbol": self.symbol,
-            "volume": self.lot,
-            "type": Mt5.ORDER_TYPE_SELL,
-            "price": price,
-            "sl": price + self.emergency_stop_loss * point,
-            "tp": price - self.emergency_take_profit * point,
-            "deviation": 5,
-            "magic": self.magic_number,
-            "comment": str(comment),
-            "type_time": Mt5.ORDER_TIME_GTC,
-            "type_filling": Mt5.ORDER_FILLING_RETURN,
-            "position": (Mt5.positions_get()[0].ticket if len(Mt5.positions_get()) == 1 else 0)
+            "action"         : Mt5.TRADE_ACTION_DEAL,
+            "symbol"         : self.symbol,
+            "volume"         : self.lot,
+            "type"           : Mt5.ORDER_TYPE_SELL,
+            "price"          : price,
+            "sl"             : price + self.emergency_stop_loss * point,
+            "tp"             : price - self.emergency_take_profit * point,
+            "deviation"      : 5,
+            "magic"          : self.magic_number,
+            "comment"        : str(comment),
+            "type_time"      : Mt5.ORDER_TIME_GTC,
+            "type_filling"   : Mt5.ORDER_FILLING_RETURN,
+            "position"       : (Mt5.positions_get()[0].ticket if len(Mt5.positions_get()) == 1 else 0)
         }
         result = Mt5.order_send(request)
         self.request_result(price, result)
@@ -164,20 +164,19 @@ class Trade:
         # Send a trading request
         # Check the execution result
         print(f'Order sent: {self.symbol}, {self.lot} lot(s), at {price}.')
+        print('INJAAAA?')
         if result.retcode != Mt5.TRADE_RETCODE_DONE:
-            print('--'*25)
+            print('!!'*25)
             print(f'Something went wrong while retrieving ret_code, error: {result.retcode}')
-            print('--'*25)
+            print('!!!'*25)
             print('Error Discription :')
             ReturnErorrDisc(result.retcode)
-            print('--'*25)
+            print('!!'*25)
             print('Statistics :')
             self.statistics()
-            print('--'*25)
+            print('!!'*25)
             TerminatedMT()
             
-            
-
         # Print the result
         if result.retcode == Mt5.TRADE_RETCODE_DONE:
             if len(Mt5.positions_get(symbol=self.symbol)) == 1:
@@ -188,6 +187,7 @@ class Trade:
 
     def open_position(self, buy, sell, comment=""):
         if (len(Mt5.positions_get(symbol=self.symbol)) == 0) and self.trading_time():
+            print('+1')
             if buy and not sell:
                 self.open_buy_position(comment)
                 self.total_deals += 1
@@ -241,7 +241,7 @@ class Trade:
                     self.balance += (Mt5.history_deals_get((datetime.today() - timedelta(days=1)),
                                                            datetime.now())[-1].profit)
                 self.statistics()
-
+                print('')
             elif ((points / Mt5.symbol_info(self.symbol).point) * -1) >= self.stop_loss:
                 self.loss_deals += 1
                 self.close_position(comment)
@@ -277,8 +277,6 @@ class Trade:
                 return True
         return False
 
-
-
 def ReturnErorrDisc(retcode):
     if retcode== 10018: 
         print('Market is closed')
@@ -293,6 +291,9 @@ def ReturnErorrDisc(retcode):
         
     elif retcode== 10017: 
         print('Trade is disabled')
+        
+    elif retcode== 10004: 
+        print('Requote')
         
 def TerminatedMT():
     sys.exit("Exiting the code with sys.exit()!")

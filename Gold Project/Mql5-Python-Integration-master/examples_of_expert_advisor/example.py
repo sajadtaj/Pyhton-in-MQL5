@@ -22,13 +22,13 @@ trade = Trade(
 time = 0
 while True:
 
-    tick = Tick(trade.symbol)
+    tick  = Tick(trade.symbol)
     rates = Rates(trade.symbol, 1, 0, 1)
 
     if tick.time_msc != time:
         buy = (tick.last > rates.open)
         sell = (tick.last < rates.open)
-
+ 
         trade.open_position(buy, sell, 'Example Advisor')
 
     time = tick.time_msc
